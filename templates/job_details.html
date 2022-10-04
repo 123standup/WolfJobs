@@ -28,7 +28,7 @@
                                         <p class="article-content">Email ID: {{record.email}}</p>
                                         <p class="article-content">Phone: {{record.phone}}</p>
                                         <p class="article-content">Address: {{record.address}}</p>
-                                        <p class="article-content">Date of Birth: {{record.dob}}</p>
+                                        <p class="article-content">Date of Birth: {{str(record.dob)}}</p>
                                         <p class="article-content">Skills: {{record.skills}}</p>
                                         <p class="article-content">Availability: {{record.availability}} hours</p>
                                         <p class="article-content">Schedule: {{record.schedule}}</p>
@@ -69,10 +69,12 @@
                             {{ form.hidden_tag() }}
                             <fieldset class="form-group">
                                 <h2>{{ job.job_title }}</h2>
+
+                                <!-- <h2>{{ applicant.legal_name }}</h2> -->
                                 <br>
                                 <div class="form-group">
                                     {{ form.apply_name.label(class="form-control-label") }}
-                
+
                                     {% if form.apply_name.errors %}
                                         {{ form.apply_name(class="form-control form-control-lg is-invalid") }}
                                         <div class="invalid-feedback">

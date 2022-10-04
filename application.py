@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from types import MethodDescriptorType
-# from bson.objectid import ObjectId
+# from django.shortcuts import render
+from bson.objectid import ObjectId
 
 from flask_wtf import form
 from utilities import Utilities
@@ -11,12 +12,13 @@ from flask.helpers import make_response
 from flask.json import jsonify
 from flask_mail import Mail, Message
 import jwt
-from forms import ForgotPasswordForm, RegistrationForm, LoginForm, ResetPasswordForm, PostingForm, ApplyForm
+from forms import ForgotPasswordForm, RegistrationForm, LoginForm, ResetPasswordForm, PostingForm, ApplyForm, updateProfileForm
 import bcrypt
 #from apps import App
 from flask_login import LoginManager, login_required
 from bson.objectid import ObjectId
 import database
+import sys
 
 app = Flask(__name__)
 app.secret_key = 'secret'
@@ -72,8 +74,21 @@ def register():
                 username = request.form.get('username')
                 email = request.form.get('email')
                 password = request.form.get('password')
+
+                # New function added section
+
+                name = request.form.get('name')
+                phone = request.form.get('phone')
+                address = request.form.get('address')
+                birth = request.form.get('birth')
+                skills = request.form.get('skills')
+                availability = request.form.get('availability')
+
+
+                # End
                 id = mongo.db.ath.insert_one({'name': username, 'email': email, 'pwd': bcrypt.hashpw(
-                    password.encode("utf-8"), bcrypt.gensalt()), 'temp': None})
+                    password.encode("utf-8"), bcrypt.gensalt()), 'temp': None, 'legal_name': name, 
+                    'phone': phone, 'address': address, 'birth': birth, 'skills': skills, 'availability': availability})
             flash(f'Account created for {form.username.data}!', 'success')
             return redirect(url_for('home'))
     else:
@@ -381,7 +396,18 @@ def jobDetails():
                                  '$push': {'Appliers': session['email']}})
         flash('Successfully Applied to the job!', 'success')
         return redirect(url_for('dashboard'))
+
     if login_type == "Applicant":
+
+        # print(applicant, file=sys.stdout)
+        form.apply_address.data = applicant.get('address')
+        form.apply_name.data = applicant.get('legal_name')
+        form.apply_phone.data = applicant.get('phone')
+        form.dob.data = datetime.strptime(applicant.get('birth'),'%Y-%m-%d')
+        form.skills.data = applicant.get('skills')
+        form.availability.data = applicant.get('availability')
+
+        
         return render_template(
             'job_details.html',
             job=job,
@@ -391,6 +417,7 @@ def jobDetails():
         applicant = []
         print(job_id)
         applicants = mongo.db.applier.find({'job_id': ObjectId(job_id)})
+
         for record in applicants:
             applicant.append(record)
         print(applicant)
@@ -465,6 +492,45 @@ def dummy():
     response.headers["token"] = "123456"
     return response"""
     return render_template('dummy.html')
+
+@app.route("/update_profile", methods=['GET', 'POST'])
+def updateProfile():
+
+    form = updateProfileForm()
+    email = session['email']
+    login_type = session["login_type"]
+    applicant = mongo.db.ath.find_one({'email': email})
+   
+    if form.validate_on_submit():
+        if request.method == 'POST':        
+            name = request.form.get('apply_name')
+            phone = request.form.get('apply_phone')
+            address = request.form.get('apply_address')
+            birth = request.form.get('dob')
+            skills = request.form.get('skills')
+
+            print('Break Point')
+            mongo.db.ath.update_one({ "_id": ObjectId(str(applicant.get("_id")))},
+                                            {'$set': {'legal_name': name, 'phone': phone, 
+                                            'address': address, 'birth': birth, 'skills': skills}})
+            print("Profile updated!")
+        flash(f'Profile for {applicant.get("name")} has been updated', 'success')
+        return redirect(url_for('updateProfile'))
+
+    if login_type == 'Applicant':
+
+        print(str(applicant.get('_id')))
+        form.apply_address.data = applicant.get('address')
+        form.apply_name.data = applicant.get('legal_name')
+        form.apply_phone.data = applicant.get('phone')
+        form.dob.data = datetime.strptime(applicant.get('birth'),'%Y-%m-%d')
+        form.skills.data = applicant.get('skills')
+
+        return render_template('update_profile.html', form=form)
+
+    else:
+        flash(f'No profile update needed', 'success')
+        return redirect(url_for('dashboard'))
 
 
 if __name__ == '__main__':

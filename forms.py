@@ -1,9 +1,10 @@
+from sqlite3 import Date
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.fields.core import SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from apps import App
-
+from wtforms.fields.html5 import DateField
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username',
@@ -14,6 +15,21 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField(
         'Confirm Password', validators=[
             DataRequired(), EqualTo('password')])
+
+    # Add new fields        
+    name = StringField('Name',
+                            validators=[DataRequired(), Length(min=2, max=20)])
+    phone = StringField('Phone Number',
+                            validators=[DataRequired(), Length(min=2, max=20)])
+    address = StringField('Address',
+                            validators=[DataRequired()])
+    birth = DateField('Date of Birth',
+                            format='%Y-%m-%d')
+    skills = StringField('Your Skills',
+                            validators=[DataRequired()])
+    availability = StringField('Availability (hours per day in a week): ',
+                               validators=[DataRequired()])
+    # End
     submit = SubmitField('Sign Up')
 
     def validate_email(self, email):
@@ -72,32 +88,32 @@ class PostingForm(FlaskForm):
 
 class ApplyForm(FlaskForm):
     apply_name = StringField(
-        'Name: ', validators=[
+        'Name', validators=[
             DataRequired(), Length(
                 min=2, max=20)])
     apply_phone = StringField(
-        'Phone Number: ', validators=[
+        'Phone Number', validators=[
             DataRequired(), Length(
                 min=2, max=20)])
-    apply_address = StringField('Address: ',
+    apply_address = StringField('Address',
                                 validators=[DataRequired()])
-    dob = StringField('Date of Birth: ',
-                      validators=[DataRequired(), Length(min=2, max=20)])
+    dob = DateField('Date of Birth',
+                            format='%Y-%m-%d')
     """position = StringField('Job Position applying for: ',
                            validators=[DataRequired(), Length(min=2, max=100)])
     """
-    skills = StringField('Your Skills: ',
+    skills = StringField('Your Skills',
                          validators=[DataRequired()])
     availability = StringField('Availability (hours per day in a week): ',
                                validators=[DataRequired()])
     """resume = StringField('Upload Resume: *****',
                            validators=[DataRequired(), Length(min=2, max=50)])
     """
-    signature = StringField('Signature (Full Name): ',
+    signature = StringField('Signature (Full Name)',
                             validators=[DataRequired(), Length(min=2, max=20)])
-    schedule = StringField('Schedule: ',
+    schedule = StringField('Schedule',
                            validators=[DataRequired()])
-    submit = SubmitField('APPLY')
+    submit = SubmitField('Submit')
 
 
 class ForgotPasswordForm(FlaskForm):
@@ -111,3 +127,23 @@ class ResetPasswordForm(FlaskForm):
         'Confirm Password', validators=[
             DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset')
+
+class updateProfileForm(FlaskForm):
+    apply_name = StringField(
+        'Name', validators=[
+            DataRequired(), Length(
+                min=2, max=20)])
+    apply_phone = StringField(
+        'Phone Number', validators=[
+            DataRequired(), Length(
+                min=2, max=20)])
+    apply_address = StringField('Address',
+                                validators=[DataRequired()])
+    dob = DateField('Date of Birth',
+                            format='%Y-%m-%d')
+    """position = StringField('Job Position applying for: ',
+                           validators=[DataRequired(), Length(min=2, max=100)])
+    """
+    skills = StringField('Your Skills',
+                         validators=[DataRequired()])
+    submit = SubmitField('Update')
