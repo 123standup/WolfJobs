@@ -5,7 +5,7 @@
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Profile</legend>
-                
+
                 <div class="form-group">
                     {{ form.apply_name.label(class="form-control-label") }}
 
@@ -81,6 +81,20 @@
                     {% endif %}
                 </div>
 
+                <div class="form-group">
+                    {{ form.availability.label(class="form-control-label") }}
+
+                    {% if form.availability.errors %}
+                        {{ form.availability(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.availability.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.availability(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
             </fieldset>
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}

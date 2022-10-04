@@ -508,11 +508,12 @@ def updateProfile():
             address = request.form.get('apply_address')
             birth = request.form.get('dob')
             skills = request.form.get('skills')
+            availability = request.form.get('availability')
 
             print('Break Point')
             mongo.db.ath.update_one({ "_id": ObjectId(str(applicant.get("_id")))},
                                             {'$set': {'legal_name': name, 'phone': phone, 
-                                            'address': address, 'birth': birth, 'skills': skills}})
+                                            'address': address, 'birth': birth, 'skills': skills, 'availability': availability}})
             print("Profile updated!")
         flash(f'Profile for {applicant.get("name")} has been updated', 'success')
         return redirect(url_for('updateProfile'))
@@ -525,6 +526,7 @@ def updateProfile():
         form.apply_phone.data = applicant.get('phone')
         form.dob.data = datetime.strptime(applicant.get('birth'),'%Y-%m-%d')
         form.skills.data = applicant.get('skills')
+        form.availability.data = applicant.get('availability')
 
         return render_template('update_profile.html', form=form)
 

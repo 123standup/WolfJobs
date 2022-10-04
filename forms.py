@@ -129,21 +129,10 @@ class ResetPasswordForm(FlaskForm):
     submit = SubmitField('Reset')
 
 class updateProfileForm(FlaskForm):
-    apply_name = StringField(
-        'Name', validators=[
-            DataRequired(), Length(
-                min=2, max=20)])
-    apply_phone = StringField(
-        'Phone Number', validators=[
-            DataRequired(), Length(
-                min=2, max=20)])
-    apply_address = StringField('Address',
-                                validators=[DataRequired()])
-    dob = DateField('Date of Birth',
-                            format='%Y-%m-%d')
-    """position = StringField('Job Position applying for: ',
-                           validators=[DataRequired(), Length(min=2, max=100)])
-    """
-    skills = StringField('Your Skills',
-                         validators=[DataRequired()])
+    apply_name = StringField('Name', validators=[DataRequired(), Length(min=2, max=20)])
+    apply_phone = StringField('Phone Number', validators=[DataRequired(), Length(min=2, max=20)])
+    apply_address = StringField('Address', validators=[DataRequired()])
+    dob = DateField('Date of Birth', format='%Y-%m-%d')
+    skills = StringField('Your Skills', validators=[DataRequired()])
+    availability = StringField('Availability (hours per day in a week)', validators=[DataRequired()])
     submit = SubmitField('Update')
