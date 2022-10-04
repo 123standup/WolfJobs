@@ -89,6 +89,7 @@ def register():
                 id = mongo.db.ath.insert_one({'name': username, 'email': email, 'pwd': bcrypt.hashpw(
                     password.encode("utf-8"), bcrypt.gensalt()), 'temp': None, 'legal_name': name, 
                     'phone': phone, 'address': address, 'birth': birth, 'skills': skills, 'availability': availability})
+                mongo.db.savedJobs.insert_one({'email': email, 'savedJobs': []})
             flash(f'Account created for {form.username.data}!', 'success')
             return redirect(url_for('home'))
     else:
@@ -327,8 +328,18 @@ def dashboard():
                 query_dict['industry'] = {'$eq' : industry}
         
         cursor = mongo.db.jobs.find(query_dict)
+        savedJobs = mongo.db.savedJobs.find_one({'email': email})
         get_jobs = []
         for record in cursor:
+            for appliers in record['Appliers']:
+                if appliers == email:
+                    record['haveApplied']=True;
+                    break;
+            for job in savedJobs['savedJobs']:
+                if job == str(record['_id']):
+                    print('true')
+                    record['haveSaved']=True;
+                    break;
             get_jobs.append(record)
 
         get_jobs = sorted(
@@ -336,24 +347,6 @@ def dashboard():
             key=lambda i: i['time_posted'],
             reverse=True)
         return render_template('dashboard.html', jobs=get_jobs)
-
-
-'''
-@app.route("/jobDetails", methods=['GET','POST'])
-def jobDetails():
-    form = ApplyForm()
-    email = session['email']
-    login_type = session["login_type"]
-    job_id = request.args.get("job_id")
-    if login_type=="Applicant":
-        job = mongo.db.jobs.find_one({'_id':ObjectId(job_id)})
-        applicant = mongo.db.ath.find_one({'email':email})
-        return render_template('job_details.html',job = job, form=form, applicant=applicant)
-    else:
-        return "Hi"
-
-'''
-
 
 @app.route("/jobDetails", methods=['GET', 'POST'])
 def jobDetails():
@@ -455,6 +448,42 @@ def selectApplicant():
     mongo.db.jobs.update_one({'_id': ObjectId(job_id)}, {
                          '$set': {"selected": applicant_id}})
     return redirect(url_for('dashboard'))
+
+@app.route("/jobsSaved", methods=['GET', 'POST'])
+def jobsSaved():
+ # ############################ 
+ # ########################## 
+     email = session['email']
+     cursor = mongo.db.savedJobs.find_one({'email': email})
+
+     get_all_jobs = []
+     for job_id in cursor['savedJobs']:
+         job = mongo.db.jobs.find_one({'_id': ObjectId(job_id)});
+         for appliers in job['Appliers']:
+             if appliers == email:
+                 job['haveApplied']=True;
+                 break;
+         get_all_jobs.append(job)
+     if get_all_jobs == []:
+         return render_template('jobs_saved.html', status=False)
+     else:
+         return render_template('jobs_saved.html',
+                                jobs=get_all_jobs, status=True)
+
+@app.route('/doSaveOrRemoveJob', methods=['POST', 'GET'])
+def doSaveOrRemoveJob():
+     email = session['email']
+     if request.method == "POST":
+         data = request.get_json();
+         if data['isSave']:
+             mongo.db.savedJobs.update_one({'email': email}, {
+                                  '$push': {'savedJobs': data['job_id']}})
+         else:
+             mongo.db.savedJobs.update_one({'email': email}, {
+                                  '$pull': {'savedJobs': data['job_id']}})
+
+     results = {'isSaved': bool(data['isSave'])}
+     return jsonify(results)
 
 
 @app.route("/jobsApplied", methods=['GET', 'POST'])

@@ -1,6 +1,27 @@
 {% extends "layout.html" %}
 {% block content %}
-    
+    <script type="text/javascript">
+        $(function() {
+            $(".saveOrRemoveJobBtn").click(function() {
+                var btn = $(this);
+                var sendData = {"isSave": btn.children().hasClass('far'), "job_id": btn.val()};
+                $.ajax({
+                    type: "POST",
+                    url: "/doSaveOrRemoveJob",
+                    data: JSON.stringify(sendData),
+                    contentType: "application/json",
+                    dataType: 'json',
+                    success: function(result) {
+                        if(result.isSaved){
+                            btn.html('<i class="fas fa-bookmark saveJobIcon"></i> Remove this job from saved list');
+                        }else{
+                            btn.html('<i class="far fa-bookmark saveJobIcon"></i> Save this job');
+                        }
+                    } 
+                })
+            });
+        });
+    </script>
     {% if session.get('login_type') == 'Manager' %}
         <div class="container">
             <div class="row">
@@ -132,12 +153,18 @@
                                             <p class="card-content"><b>Schedule: </b> {{ job.schedule }} hours</p>
                                             <p class="card-content"><b>Salary: </b> {{ job.salary }}</p>
                                             <p class="card-content"><b>Rewards: </b> {{ job.rewards }}</p>
-                                            <p class="card-content"><b>Rewards: </b> {{ job.selected }}</p>
-                                            {% if job.selected is none %}
-                                                <button class="btn btn-outline-dark" type="button" style="max-width: 350px; margin:10px;"><a style="color:inherit;" href="{{url_for('jobDetails',job_id = job._id)}}">Apply for this position</a></button>
+                                            <p class="card-content"><b>Rewards: </b> {{ job.haveSaved }}</p>
+                                            {% if job.haveApplied %}
+                                                <p class ="card-content" style="color:green">You already applied!</p>
                                             {% else %}
-                                                <p class ="card-content" style="color:green">Applicant already selected!</p>
+                                                <button class="btn btn-outline-dark" type="button" style="max-width: 350px; margin:10px;"><a style="color:inherit;" href="{{url_for('jobDetails',job_id = job._id)}}">Apply for this position</a></button>
                                             {% endif %}
+                                            <button class="btn btn-light saveOrRemoveJobBtn" type="button" style="max-width: 350px; margin:10px;" value="{{job._id}}">
+                                            {% if job.haveSaved %}
+                                                <i class="fas fa-bookmark saveJobIcon"></i> Remove this job from saved list
+                                            {% else %}
+                                                <i class="far fa-bookmark saveJobIcon"></i> Save this job
+                                            {% endif %}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -149,6 +176,7 @@
                 <div class="col-2">
                     <div class="vl"></div>
                     <ul class="side-bar">
+                        <li class="side-bar-li"><a class="side-bar-link" href = "{{ url_for('jobsSaved') }}">Saved Jobs</a></li>
                         <li class="side-bar-li"><a class="side-bar-link" href = "{{ url_for('jobsApplied') }}">Status</a></li>
                         <li class="side-bar-li"><a class="side-bar-link" href = "{{ url_for('dummy') }}">Guidelines</a></li>
                         <li class="side-bar-li"><a class="side-bar-link" href = "{{ url_for('updateProfile') }}">Update Profile</a></li>
@@ -158,4 +186,3 @@
         </div>
     {% endif %}
 {% endblock content %}
-

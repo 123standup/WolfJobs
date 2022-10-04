@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% if not status: %}
+        <h2>You haven't save any jobs yet!</h2>
+    {% else %}
+        <div class="container">
+            <div class="col-10">
+                <h2>Saved Jobs</h2>
+                {% for job in jobs %}
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12 card-container">
+                                <div class="card-flip">
+                                    <div class="card front contents">
+                                        <p class="card-content" style="text-align:left; font-size:30px; margin-top:10px;">{{ job.job_title }}</a>
+                                        <span class="card-content text-muted" style="float:right; font-size: 12px; margin-right:5px;">{{ job.time_posted }}</span>
+                                        </p>
+                                        <hr>
+                                        <p class="card-content">{{ job.job_description }}</p>
+                                        <p class="card-content"><b>Location:</b> {{ job.job_location }}</p>
+                                        <p class="card-content"><b>Designation:</b> {{ job.designation }}</p>
+                                        <p class="card-content"><b>Type:</b> {{ job.job_type }}</p>
+                                        <p class="card-content"><b>Industry:</b> {{ job.industry }}</p>
+                                    </div>
+                                    <div class="card back">
+                                        <p class="card-content" style="text-align:left; font-size:30px; margin-top:10px;">{{ job.job_title }}</a>
+                                        <span class="card-content text-muted" style="float:right; font-size: 12px; margin-right:5px;">{{ job.time_posted }}</span>
+                                    </p>
+                                    <hr>
+                                    <p class="card-content"><b>Skills Required:</b> {{job.skills }}</p>
+                                    <p class="card-content"><b>Schedule: </b> {{ job.schedule }} hours</p>
+                                    <p class="card-content"><b>Salary: </b> {{ job.salary }}</p>
+                                    <p class="card-content"><b>Rewards: </b> {{ job.rewards }}</p>
+                                    <p class="card-content"><b>Rewards: </b> {{ job.haveSaved }}</p>
+                                    {% if job.haveApplied %}
+                                        <p class ="card-content" style="color:green">You already applied!</p>
+                                    {% else %}
+                                        <button class="btn btn-outline-dark" type="button" style="max-width: 350px; margin:10px;"><a style="color:inherit;" href="{{url_for('jobDetails',job_id = job._id)}}">Apply for this position</a></button>
+                                    {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    <br><br>
+    <button type="button" class="btn" style="max-width:100px; margin:5px;"><a style="color:green" href="{{url_for('dashboard')}}">Back</a></button>
+{% endblock content %}
