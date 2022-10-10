@@ -7,6 +7,8 @@
 [![Issues](https://img.shields.io/github/issues/Chloe-Ku/WolfJobs)](https://github.com/Chloe-Ku/WolfJobs/issues)
 [![last commit](https://img.shields.io/github/last-commit/Chloe-Ku/WolfJobs)](https://github.com/Chloe-Ku/WolfJobs/graphs/commit-activity)
 ![repo size](https://img.shields.io/github/repo-size/Chloe-Ku/WolfJobs)
+[![Coverage Status](https://coveralls.io/repos/github/juliachiu1/WolfJobs/badge.svg)](https://coveralls.io/github/juliachiu1/WolfJobs)
+
 
 # WolfJobs 2.0
 Need a side Hustle or want to get some quick rewards? Wolfjobs provides the perfect platform to meet your requirements.
